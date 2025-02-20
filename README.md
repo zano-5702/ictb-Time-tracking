@@ -1,5 +1,5 @@
 # ictb-Time-tracking
-git clone 
+git clone https://github.com/zano-5702/ictb-Time-tracking.git
 
 #Installation Adapter und Puppeteer-Core
 #cd /opt/iobroker/ictb-Time-tracking
