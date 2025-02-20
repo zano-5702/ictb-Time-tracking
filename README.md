@@ -1,4 +1,6 @@
 # ictb-Time-tracking
+git clone 
+
 #Installation Adapter und Puppeteer-Core
 #cd /opt/iobroker/ictb-Time-tracking
 #npm install puppeteer-core
