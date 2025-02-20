@@ -1,6 +1,6 @@
 {
     "common": {
-        "name": "my-time-adapter",
+        "name": "ictb-Time-Tracking",
         "version": "0.0.1",
         "news": {
             "0.0.1": {
@@ -60,7 +60,7 @@
         "icon": "my-time-adapter.png",
         "enabled": true,
         "extIcon": "https://raw.githubusercontent.com/oliver/ioBroker.my-time-adapter/main/admin/my-time-adapter.png",
-        "readme": "https://github.com/oliver/ioBroker.my-time-adapter/blob/main/README.md",
+        "readme": "https://github.com/oliver/ioBroker.ictb-Time-tracking/blob/main/README.md",
         "loglevel": "info",
         "tier": 3,
         "mode": "daemon",
