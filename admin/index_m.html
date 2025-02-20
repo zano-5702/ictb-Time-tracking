@@ -1,1 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My Time Adapter - Kunden</title>
+
+    <!-- WICHTIG: Standard ioBroker-Admin-Skripte -->
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css">
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+    <!-- (Optional) words.js, falls du Übersetzungen nutzt -->
+
+    <style>
+      table {
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th, td {
+        border: 1px solid #ccc;
+        padding: 4px;
+      }
+      input[type="text"], input[type="number"] {
+        width: 120px;
+      }
+    </style>
+
+    <script>
+    // Globale Variable, um onChange(true/false) aufrufen zu können
+    let globalOnChange;
+
+    // Lokales Datenobjekt
+    let myConfig = {
+        customers: []
+    };
+
+    /**
+     * 1) load(settings, onChange)
+     * -> Wird von ioBroker aufgerufen, wenn die Admin-Seite geladen wird.
+     */
+    function load(settings, onChange) {
+        // A) onChange in globale Variable
+        globalOnChange = onChange;
+
+        // B) Kunden-Array aus settings (this.config)
+        settings.customers = settings.customers || [];
+        myConfig.customers = settings.customers;
+
+        // C) Tabelle bauen
+        buildCustomersTable();
+
+        // D) Am Ende: onChange(false) => keine Änderungen anfangs
+        onChange(false);
+    }
+
+    /**
+     * 2) save(callback)
+     * -> Wird von ioBroker aufgerufen, wenn der User "Speichern" klickt.
+     */
+    function save(callback) {
+        // Erstelle das Objekt, das in adapter.config gespeichert wird
+        const obj = {
+            customers: myConfig.customers
+        };
+        // Übergib es an ioBroker
+        callback(obj);
+    }
+
+    /**
+     * Erzeugt/aktualisiert die Kunden-Tabelle
+     */
+    function buildCustomersTable() {
+        const tableBody = document.getElementById("custTbody");
+        tableBody.innerHTML = "";
+
+        myConfig.customers.forEach((cust, idx) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><input type="text" class="custName" value="${cust.name || ""}"></td>
+                <td><input type="text" class="custAddr" value="${cust.address || ""}"></td>
+                <td><input type="number" class="custRate" value="${cust.hourlyRate || 0}"></td>
+                <td><button class="btnRemove">X</button></td>
+            `;
+
+            // Name-Input
+            const nameInput = tr.querySelector(".custName");
+            nameInput.addEventListener("change", () => {
+                myConfig.customers[idx].name = nameInput.value;
+                globalOnChange(true); // Speichern-Button aktivieren
+            });
+
+            // Adresse-Input
+            const addrInput = tr.querySelector(".custAddr");
+            addrInput.addEventListener("change", () => {
+                myConfig.customers[idx].address = addrInput.value;
+                globalOnChange(true);
+            });
+
+            // Stundensatz
+            const rateInput = tr.querySelector(".custRate");
+            rateInput.addEventListener("change", () => {
+                myConfig.customers[idx].hourlyRate = parseFloat(rateInput.value);
+                globalOnChange(true);
+            });
+
+            // Remove-Button
+            const removeBtn = tr.querySelector(".btnRemove");
+            removeBtn.addEventListener("click", () => {
+                myConfig.customers.splice(idx, 1);
+                buildCustomersTable();
+                globalOnChange(true);
+            });
+
+            tableBody.appendChild(tr);
+        });
+    }
+
+    /**
+     * Fügt einen neuen Kunden hinzu
+     */
+    function addCustomer() {
+        myConfig.customers.push({ name: "", address: "", hourlyRate: 0 });
+        buildCustomersTable();
+        globalOnChange(true);
+    }
+    </script>
+</head>
+
+<body>
+    <h1>Kundenverwaltung</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Adresse</th>
+                <th>Stundensatz</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="custTbody"></tbody>
+    </table>
+
+    <button onclick="addCustomer()">Kunde hinzufügen</button>
+</body>
+</html>
 
