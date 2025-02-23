@@ -1,4 +1,4 @@
-# ictb-Time-tracking
+# ictb-time-tracking
 git clone https://github.com/zano-5702/ictb-Time-tracking.git
 
 Falls ordner schon existiert sudo rm -r ictb-Time-tracking
