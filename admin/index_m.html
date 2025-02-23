@@ -1,146 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>My Time Adapter - Kunden</title>
-
-    <!-- WICHTIG: Standard ioBroker-Admin-Skripte -->
-    <link rel="stylesheet" type="text/css" href="../../css/adapter.css">
-    <script type="text/javascript" src="../../js/translate.js"></script>
-    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
-    <!-- (Optional) words.js, falls du Übersetzungen nutzt -->
-
+    <meta charset="utf-8" />
+    <title>WorkTime Adapter – Konfiguration</title>
+    <link rel="stylesheet" href="admin.css">
     <style>
-      table {
-        border-collapse: collapse;
-        margin-top: 10px;
-      }
-      th, td {
-        border: 1px solid #ccc;
-        padding: 4px;
-      }
-      input[type="text"], input[type="number"] {
-        width: 120px;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #eee;
+            margin: 5px 0;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
     </style>
-
-    <script>
-    // Globale Variable, um onChange(true/false) aufrufen zu können
-    let globalOnChange;
-
-    // Lokales Datenobjekt
-    let myConfig = {
-        customers: []
-    };
-
-    /**
-     * 1) load(settings, onChange)
-     * -> Wird von ioBroker aufgerufen, wenn die Admin-Seite geladen wird.
-     */
-    function load(settings, onChange) {
-        // A) onChange in globale Variable
-        globalOnChange = onChange;
-
-        // B) Kunden-Array aus settings (this.config)
-        settings.customers = settings.customers || [];
-        myConfig.customers = settings.customers;
-
-        // C) Tabelle bauen
-        buildCustomersTable();
-
-        // D) Am Ende: onChange(false) => keine Änderungen anfangs
-        onChange(false);
-    }
-
-    /**
-     * 2) save(callback)
-     * -> Wird von ioBroker aufgerufen, wenn der User "Speichern" klickt.
-     */
-    function save(callback) {
-        // Erstelle das Objekt, das in adapter.config gespeichert wird
-        const obj = {
-            customers: myConfig.customers
-        };
-        // Übergib es an ioBroker
-        callback(obj);
-    }
-
-    /**
-     * Erzeugt/aktualisiert die Kunden-Tabelle
-     */
-    function buildCustomersTable() {
-        const tableBody = document.getElementById("custTbody");
-        tableBody.innerHTML = "";
-
-        myConfig.customers.forEach((cust, idx) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><input type="text" class="custName" value="${cust.name || ""}"></td>
-                <td><input type="text" class="custAddr" value="${cust.address || ""}"></td>
-                <td><input type="number" class="custRate" value="${cust.hourlyRate || 0}"></td>
-                <td><button class="btnRemove">X</button></td>
-            `;
-
-            // Name-Input
-            const nameInput = tr.querySelector(".custName");
-            nameInput.addEventListener("change", () => {
-                myConfig.customers[idx].name = nameInput.value;
-                globalOnChange(true); // Speichern-Button aktivieren
-            });
-
-            // Adresse-Input
-            const addrInput = tr.querySelector(".custAddr");
-            addrInput.addEventListener("change", () => {
-                myConfig.customers[idx].address = addrInput.value;
-                globalOnChange(true);
-            });
-
-            // Stundensatz
-            const rateInput = tr.querySelector(".custRate");
-            rateInput.addEventListener("change", () => {
-                myConfig.customers[idx].hourlyRate = parseFloat(rateInput.value);
-                globalOnChange(true);
-            });
-
-            // Remove-Button
-            const removeBtn = tr.querySelector(".btnRemove");
-            removeBtn.addEventListener("click", () => {
-                myConfig.customers.splice(idx, 1);
-                buildCustomersTable();
-                globalOnChange(true);
-            });
-
-            tableBody.appendChild(tr);
-        });
-    }
-
-    /**
-     * Fügt einen neuen Kunden hinzu
-     */
-    function addCustomer() {
-        myConfig.customers.push({ name: "", address: "", hourlyRate: 0 });
-        buildCustomersTable();
-        globalOnChange(true);
-    }
-    </script>
 </head>
-
 <body>
-    <h1>Kundenverwaltung</h1>
+    <div class="container">
+        <h1>WorkTime Adapter – Konfiguration</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Adresse</th>
-                <th>Stundensatz</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody id="custTbody"></tbody>
-    </table>
+        <h2>Kundenstamm</h2>
+        <form id="customerForm">
+            <label for="customerName">Kundenname:</label>
+            <input type="text" id="customerName" required>
+            
+            <label for="customerAddress">Adresse:</label>
+            <input type="text" id="customerAddress">
+            
+            <label for="hourlyRate">Stundensatz (EUR):</label>
+            <input type="number" id="hourlyRate" step="0.01">
+            
+            <label for="assignment">Stundenzuweisung / Auftrag:</label>
+            <input type="text" id="assignment">
+            
+            <button type="submit">Kunde hinzufügen</button>
+        </form>
+        <h3>Aktuelle Kunden</h3>
+        <ul id="customerList"></ul>
 
-    <button onclick="addCustomer()">Kunde hinzufügen</button>
+        <hr>
+
+        <h2>Mitarbeiter</h2>
+        <form id="employeeForm">
+            <label for="deviceId">Device ID (z. B. traccar.0.devices.1):</label>
+            <input type="text" id="deviceId" required>
+            
+            <label for="firstName">Vorname:</label>
+            <input type="text" id="firstName" required>
+            
+            <label for="lastName">Nachname:</label>
+            <input type="text" id="lastName" required>
+            
+            <button type="submit">Mitarbeiter hinzufügen</button>
+        </form>
+        <h3>Aktuelle Mitarbeiter</h3>
+        <ul id="employeeList"></ul>
+
+        <hr>
+
+        <h2>Arbeitslog</h2>
+        <div id="workLog">
+            <!-- Hier werden später die Logeinträge angezeigt -->
+        </div>
+    </div>
+    <script src="index_m.js"></script>
 </body>
 </html>
-
